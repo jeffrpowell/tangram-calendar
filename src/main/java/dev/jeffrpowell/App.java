@@ -22,11 +22,9 @@ public class App
                 .limit(pieces.size())
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
         int attempts = 0;
+        long t = System.nanoTime();
         while (!splitPermutationNum.equals(maxIndexes)) {
             attempts++;
-            if (attempts % 100 == 0) {
-                System.out.println(attempts + " (" + splitPermutationNum.stream().map(i -> i.toString()).collect(Collectors.joining()) + ")");
-            }
             List<Piece> pieceChoices = new ArrayList<>();
             for (int i = 0; i < pieces.size(); i++) {
                 pieceChoices.add(pieces.get(i).get(splitPermutationNum.get(i)));
@@ -41,8 +39,8 @@ public class App
                 break;
             }
         }
-        System.out.println();
-        System.out.println(attempts);
+        System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - t));
+        System.out.println("Attempted rotation permutations: " + attempts);
     }
 
     private static List<Integer> splitPermutationNum(Long perm) {

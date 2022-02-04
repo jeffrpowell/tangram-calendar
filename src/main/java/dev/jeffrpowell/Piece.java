@@ -19,6 +19,10 @@ public class Piece {
         originVectors.addAll(Arrays.asList(pts));
     }
 
+    public Piece(Set<Point2D> pts) {
+        this.originVectors = pts;
+    }
+
     public Set<Point2D> getOriginVectors() {
         return originVectors;
     }
