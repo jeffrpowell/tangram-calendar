@@ -1,11 +1,14 @@
 package dev.jeffrpowell;
 
+import java.awt.geom.Point2D;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.Month;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.awt.geom.Point2D;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class GridConstants {
     private GridConstants() {}
@@ -78,15 +81,33 @@ public class GridConstants {
         DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(6, 7));
     }
 
-    public static Point2D getMonthLocation(Month m) {
-        return MONTH_LOCATIONS.get(m);
-    }
+    public static Map<Point2D, Boolean> generateGrid(LocalDate targetDate) {
+        Map<Point2D, Boolean> grid = MONTH_LOCATIONS.entrySet().stream()
+            .filter(entry -> entry.getKey() != targetDate.getMonth())
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toMap(
+                Function.identity(),
+                pt -> false
+            ));
 
-    public static Point2D getDayLocation(int d) {
-        return DAY_LOCATIONS.get(d);
-    }
+        grid.putAll(DAY_LOCATIONS.entrySet().stream()
+            .filter(entry -> entry.getKey() != targetDate.getDayOfMonth())
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toMap(
+                Function.identity(),
+                pt -> false
+            ))
+        );
 
-    public static Point2D getDayOfWeekLocation(DayOfWeek dow) {
-        return DAY_OF_WEEK_LOCATIONS.get(dow);
+        grid.putAll(DAY_OF_WEEK_LOCATIONS.entrySet().stream()
+            .filter(entry -> entry.getKey() != targetDate.getDayOfWeek())
+            .map(Map.Entry::getValue)
+            .collect(Collectors.toMap(
+                Function.identity(),
+                pt -> false
+            ))
+        );
+
+        return grid;
     }
 }

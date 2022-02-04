@@ -1,5 +1,6 @@
 package dev.jeffrpowell;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ public class App
                 .limit(pieces.size())
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
         int attempts = 0;
+        LocalDate targetDate = LocalDate.now();
         long t = System.nanoTime();
         while (!splitPermutationNum.equals(maxIndexes)) {
             attempts++;
@@ -29,7 +31,7 @@ public class App
             for (int i = 0; i < pieces.size(); i++) {
                 pieceChoices.add(pieces.get(i).get(splitPermutationNum.get(i)));
             }
-            Grid nextGrid = new Grid(pieceChoices);
+            Grid nextGrid = new Grid(pieceChoices, targetDate);
             if (nextGrid.tryToFindSolution()) {
                 printSolution(nextGrid);
                 break;
@@ -41,15 +43,6 @@ public class App
         }
         System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - t));
         System.out.println("Attempted rotation permutations: " + attempts);
-    }
-
-    private static List<Integer> splitPermutationNum(Long perm) {
-        String permStr = perm.toString();
-        List<Integer> ints = new ArrayList<>();
-        for (char c : permStr.toCharArray()) {
-            ints.add(Integer.parseInt(String.valueOf(c)));
-        }
-        return ints;
     }
 
     private static List<Integer> getNextPermutation(List<Integer> lastPermNum, List<Integer> maxIndexes) {

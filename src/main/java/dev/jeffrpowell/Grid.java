@@ -11,18 +11,20 @@ public class Grid {
     private final Map<Point2D, Piece> placedPieces;
     private final Map<Point2D, Boolean> covered;
     
-    public Grid(List<Piece> allPieces) {
+    public Grid(List<Piece> allPieces, LocalDate targetDate) {
         this.allPieces = allPieces;
         this.placedPieces = new HashMap<>();
-        this.covered = new HashMap<>();
+        this.covered = GridConstants.generateGrid(targetDate);
     }
 
-    public void registerTargetDate(LocalDate d) {
-        covered.put(GridConstants.getMonthLocation(d.getMonth()), true);
-        covered.put(GridConstants.getDayLocation(d.getDayOfMonth()), true);
-        covered.put(GridConstants.getDayOfWeekLocation(d.getDayOfWeek()), true);
-    }
-
+    /**
+     * Pick next pt in row-major order
+     * For each piece, for each piece vector
+     *      translate the piece so the looped piece vector lands on the next pt
+     *      if there are no collisions with the rest of the piece, generate the next branch to try (I think there is only one possible valid placement)
+     * If there are no pieces that can fit in the next pt, current branch is invalid and should be abandoned
+     * @return
+     */
     public boolean tryToFindSolution() {
         return false;
     }
