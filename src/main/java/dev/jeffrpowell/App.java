@@ -1,8 +1,12 @@
 package dev.jeffrpowell;
 
+import java.awt.geom.Point2D;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -10,6 +14,9 @@ public class App
 {
     public static void main( String[] args )
     {
+        System.out.println("TANGRAM CALENDAR SOLVER");
+        System.out.println();
+        System.out.println("Initializing all the pieces and their rotations");
         List<List<Piece>> pieces = PieceFactory.createPieces().stream()
             .map(PieceFactory::generateDerivativePieces)
             .collect(Collectors.toList());
@@ -24,6 +31,7 @@ public class App
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
         int attempts = 0;
         LocalDate targetDate = LocalDate.now();
+        System.out.println("Solving for " + targetDate);
         long t = System.nanoTime();
         while (!splitPermutationNum.equals(maxIndexes)) {
             attempts++;
@@ -32,8 +40,9 @@ public class App
                 pieceChoices.add(pieces.get(i).get(splitPermutationNum.get(i)));
             }
             Grid nextGrid = new Grid(pieceChoices, targetDate);
-            if (nextGrid.tryToFindSolution()) {
-                printSolution(nextGrid);
+            Optional<GridBranch> result = nextGrid.tryToFindSolution();
+            if (result.isPresent()) {
+                printSolution(result.get());
                 break;
             }
             splitPermutationNum = getNextPermutation(splitPermutationNum, maxIndexes);
@@ -42,7 +51,7 @@ public class App
             }
         }
         System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - t));
-        System.out.println("Attempted rotation permutations: " + attempts);
+        System.out.println("Attempted rotation permutations (out of 8.3MM): " + attempts);
     }
 
     private static List<Integer> getNextPermutation(List<Integer> lastPermNum, List<Integer> maxIndexes) {
@@ -57,7 +66,15 @@ public class App
         return nextPermNum;
     }
 
-    private static void printSolution(Grid g) {
-        
+    private static void printSolution(GridBranch branch) {
+        List<Piece> solutionPieces = branch.getSolutionPieces();
+        Map<Point2D, String> printInstructions = new HashMap<>();
+        for (int i = 0; i < solutionPieces.size(); i++) {
+            Piece p = solutionPieces.get(i);
+            for (Point2D pt : p.getOriginVectors()) {
+                printInstructions.put(pt, Integer.toString(i));
+            }
+        }
+        System.out.println(Point2DUtils.pointsToString(printInstructions));
     }
 }
