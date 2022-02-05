@@ -46,8 +46,8 @@ public class PieceFactory {
         Set<Point2D> pts = p.getOriginVectors();
         double maxY = pts.stream().map(Point2D::getY).max(Comparator.naturalOrder()).get();
         return new Piece(pts.stream()
-            .map(pt -> PieceFactory.rotatePtRightDegreesAround0(pt, 90D))
-            .map(pt -> PieceFactory.applyVectorToPt(new Point2D.Double(maxY, 0), pt))
+            .map(pt -> Point2DUtils.rotatePtRightDegreesAround0(pt, 90D))
+            .map(pt -> Point2DUtils.applyVectorToPt(new Point2D.Double(maxY, 0), pt))
             .collect(Collectors.toSet()));
     }
 
@@ -55,26 +55,8 @@ public class PieceFactory {
         Set<Point2D> pts = p.getOriginVectors();
         double maxX = pts.stream().map(Point2D::getX).max(Comparator.naturalOrder()).get();
         return new Piece(pts.stream()
-            .map(pt -> PieceFactory.applyVectorToPt(new Point2D.Double(-2 * pt.getX() + maxX, 0), pt))
+            .map(pt -> Point2DUtils.applyVectorToPt(new Point2D.Double(-2 * pt.getX() + maxX, 0), pt))
             .collect(Collectors.toSet()));
     }
 
-    /**
-     * This assumes a left-handed coordinate system, with positive-x going right and positive-y going down
-     * https://en.wikipedia.org/wiki/Rotation_matrix
-     * @param pt
-     * @param degrees
-     * @return 
-     */
-    private static Point2D rotatePtRightDegreesAround0(Point2D pt, double degrees) {
-        double radians = degrees * Math.PI / 180.0;
-        return new Point2D.Double(
-            pt.getX() * Math.round(Math.cos(radians)) - pt.getY() * Math.round(Math.sin(radians)), 
-            pt.getX() * Math.round(Math.sin(radians)) + pt.getY() * Math.round(Math.cos(radians))
-        );
-    }
-
-    private static Point2D applyVectorToPt(Point2D vector, Point2D pt) {
-        return new Point2D.Double(pt.getX() + vector.getX(), pt.getY() + vector.getY());
-    }
 }
