@@ -75,7 +75,7 @@ public class GridBranch {
         return solutionPieces;
     }
 
-    private Point2D findNextPoint() {
+    Point2D findNextPoint() {
         double minY = covered.entrySet().stream()
             .filter(entry -> !entry.getValue())
             .map(Map.Entry::getKey)
@@ -87,11 +87,11 @@ public class GridBranch {
             .min(Comparator.comparing(Point2D::getX)).get();
     }
     
-    private List<Piece> translatePieceToPoint(Point2D pt, Piece p) {
+    static List<Piece> translatePieceToPoint(Point2D pt, Piece p) {
         return p.getOriginVectors().stream().map(vector -> translateVectorsToPoint(pt, vector, p)).collect(Collectors.toList());
     }
 
-    private Piece translateVectorsToPoint(Point2D pt, Point2D localVector, Piece p) {
+    static Piece translateVectorsToPoint(Point2D pt, Point2D localVector, Piece p) {
         Point2D transform = new Point2D.Double(-localVector.getX(), -localVector.getY());
         return new Piece(p.getOriginVectors().stream()
             .map(originVector -> Point2DUtils.applyVectorToPt(transform, originVector))
@@ -100,11 +100,11 @@ public class GridBranch {
         );
     }
 
-    private boolean canPieceFit(Piece p) {
+    boolean canPieceFit(Piece p) {
         return p.getOriginVectors().stream().allMatch(pt -> covered.containsKey(pt) && Boolean.FALSE.equals(covered.get(pt)));
     }
 
-    private void createDownstreamBranch(Piece p) {
+    void createDownstreamBranch(Piece p) {
         Set<Point2D> piecePts = p.getOriginVectors();
         Map<Point2D, Boolean> newCovered = covered.entrySet().stream()
             .collect(Collectors.toMap(

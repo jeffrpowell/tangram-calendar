@@ -18,10 +18,13 @@ public class Grid {
         while(!branches.isEmpty()) {
             GridBranch branch = branches.getFirst();
             if (branch.containsAPossibleSolution()) {
-                return Optional.of(branch);
-            }
-            else {
-                branches.addAll(branch.getDownstreamBranches());
+                List<GridBranch> downstreamBranches = branch.getDownstreamBranches();
+                if (downstreamBranches.isEmpty()) {
+                    return Optional.of(branch);
+                }
+                else {
+                    branches.addAll(branch.getDownstreamBranches());
+                }
             }
         }
         return Optional.empty();
