@@ -15,7 +15,7 @@ public class GridBranch {
     private final List<Piece> unplacedPieces;
     private final Map<Point2D, Boolean> covered;
     private final List<GridBranch> downstreamBranches;
-    private final List<Piece> solutionPieces;
+    private final List<TranslatedPiece> solutionPieces;
     
     /**
      * Root-node constructor
@@ -34,7 +34,7 @@ public class GridBranch {
      * @param unplacedPieces
      * @param covered
      */
-    public GridBranch(List<Piece> unplacedPieces, Map<Point2D, Boolean> covered, List<Piece> solutionPieces) {
+    public GridBranch(List<Piece> unplacedPieces, Map<Point2D, Boolean> covered, List<TranslatedPiece> solutionPieces) {
         this.unplacedPieces = unplacedPieces;
         this.covered = covered;
         this.downstreamBranches = new ArrayList<>();
@@ -52,8 +52,8 @@ public class GridBranch {
     public boolean containsAPossibleSolution() {
         Point2D nextPt = findNextPoint();
         for (Piece piece : unplacedPieces) {
-            List<Piece> translations = translatePieceToPoint(nextPt, piece);
-            Optional<Piece> pieceLocationThatFits = translations.stream().filter(this::canPieceFit).findAny();
+            List<TranslatedPiece> translations = translatePieceToPoint(nextPt, piece);
+            Optional<TranslatedPiece> pieceLocationThatFits = translations.stream().filter(this::canPieceFit).findAny();
             if (pieceLocationThatFits.isPresent()) {
                 if (unplacedPieces.size() == 1) {
                     solutionPieces.add(pieceLocationThatFits.get());
@@ -71,8 +71,16 @@ public class GridBranch {
         return downstreamBranches;
     }
 
-    public List<Piece> getSolutionPieces() {
+    public List<TranslatedPiece> getSolutionPieces() {
         return solutionPieces;
+    }
+
+    List<Piece> getUnplacedPieces() {
+        return unplacedPieces;
+    }
+
+    Map<Point2D, Boolean> getCovered() {
+        return covered;
     }
 
     Point2D findNextPoint() {
@@ -87,25 +95,25 @@ public class GridBranch {
             .min(Comparator.comparing(Point2D::getX)).get();
     }
     
-    static List<Piece> translatePieceToPoint(Point2D pt, Piece p) {
+    static List<TranslatedPiece> translatePieceToPoint(Point2D pt, Piece p) {
         return p.getOriginVectors().stream().map(vector -> translateVectorsToPoint(pt, vector, p)).collect(Collectors.toList());
     }
 
-    static Piece translateVectorsToPoint(Point2D pt, Point2D localVector, Piece p) {
+    static TranslatedPiece translateVectorsToPoint(Point2D pt, Point2D localVector, Piece p) {
         Point2D transform = new Point2D.Double(-localVector.getX(), -localVector.getY());
-        return new Piece(p.getOriginVectors().stream()
+        return new TranslatedPiece(p, p.getOriginVectors().stream()
             .map(originVector -> Point2DUtils.applyVectorToPt(transform, originVector))
             .map(newPieceVector -> Point2DUtils.applyVectorToPt(newPieceVector, pt))
             .collect(Collectors.toSet())
         );
     }
 
-    boolean canPieceFit(Piece p) {
-        return p.getOriginVectors().stream().allMatch(pt -> covered.containsKey(pt) && Boolean.FALSE.equals(covered.get(pt)));
+    boolean canPieceFit(TranslatedPiece p) {
+        return p.getLocations().stream().allMatch(pt -> covered.containsKey(pt) && Boolean.FALSE.equals(covered.get(pt)));
     }
 
-    void createDownstreamBranch(Piece p) {
-        Set<Point2D> piecePts = p.getOriginVectors();
+    void createDownstreamBranch(TranslatedPiece p) {
+        Set<Point2D> piecePts = p.getLocations();
         Map<Point2D, Boolean> newCovered = covered.entrySet().stream()
             .collect(Collectors.toMap(
                 entry -> entry.getKey(),
@@ -116,8 +124,9 @@ public class GridBranch {
                     return entry.getValue();
                 }
             ));
-        List<Piece> newUnplacedPieces = unplacedPieces.stream().filter(piece -> !piece.equals(p)).collect(Collectors.toList());
-        List<Piece> newSolutionPieces = Stream.concat(solutionPieces.stream(), Stream.of(p)).collect(Collectors.toList());
+        List<Piece> newUnplacedPieces = unplacedPieces.stream().filter(piece -> !piece.equals(p.getOriginPiece())).collect(Collectors.toList());
+        List<TranslatedPiece> newSolutionPieces = Stream.concat(solutionPieces.stream(), Stream.of(p)).collect(Collectors.toList());
         downstreamBranches.add(new GridBranch(newUnplacedPieces, newCovered, newSolutionPieces));
+        //Boolean.TRUE.equals(newCovered.values().stream().noneMatch(Boolean.FALSE::equals))
     }
 }

@@ -67,11 +67,11 @@ public class App
     }
 
     private static void printSolution(GridBranch branch) {
-        List<Piece> solutionPieces = branch.getSolutionPieces();
+        List<TranslatedPiece> solutionPieces = branch.getSolutionPieces();
         Map<Point2D, String> printInstructions = new HashMap<>();
         for (int i = 0; i < solutionPieces.size(); i++) {
-            Piece p = solutionPieces.get(i);
-            for (Point2D pt : p.getOriginVectors()) {
+            TranslatedPiece p = solutionPieces.get(i);
+            for (Point2D pt : p.getLocations()) {
                 printInstructions.put(pt, Integer.toString(i));
             }
         }

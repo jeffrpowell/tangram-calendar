@@ -16,14 +16,14 @@ public class Grid {
 
     public Optional<GridBranch> tryToFindSolution() {
         while(!branches.isEmpty()) {
-            GridBranch branch = branches.getFirst();
+            GridBranch branch = branches.pop();
             if (branch.containsAPossibleSolution()) {
                 List<GridBranch> downstreamBranches = branch.getDownstreamBranches();
                 if (downstreamBranches.isEmpty()) {
                     return Optional.of(branch);
                 }
                 else {
-                    branches.addAll(branch.getDownstreamBranches());
+                    branch.getDownstreamBranches().forEach(branches::push);
                 }
             }
         }
