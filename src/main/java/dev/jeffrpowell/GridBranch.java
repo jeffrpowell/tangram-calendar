@@ -18,13 +18,25 @@ public class GridBranch {
     private final List<TranslatedPiece> solutionPieces;
     
     /**
-     * Root-node constructor
+     * Root-node constructor for SnipeGrid
      * @param unplacedPieces
      * @param targetDate
      */
     public GridBranch(List<Piece> unplacedPieces, LocalDate targetDate) {
         this.unplacedPieces = unplacedPieces;
         this.covered = GridConstants.generateGrid(targetDate);
+        this.downstreamBranches = new ArrayList<>();
+        this.solutionPieces = new ArrayList<>();
+    }
+
+    /**
+     * Root-node constructor for GatherGrid
+     * @param unplacedPieces
+     * @param targetDate
+     */
+    public GridBranch(List<Piece> unplacedPieces) {
+        this.unplacedPieces = unplacedPieces;
+        this.covered = GridConstants.generateGrid();
         this.downstreamBranches = new ArrayList<>();
         this.solutionPieces = new ArrayList<>();
     }
@@ -127,6 +139,12 @@ public class GridBranch {
         List<Piece> newUnplacedPieces = unplacedPieces.stream().filter(piece -> !piece.equals(p.getOriginPiece())).collect(Collectors.toList());
         List<TranslatedPiece> newSolutionPieces = Stream.concat(solutionPieces.stream(), Stream.of(p)).collect(Collectors.toList());
         downstreamBranches.add(new GridBranch(newUnplacedPieces, newCovered, newSolutionPieces));
-        //Boolean.TRUE.equals(newCovered.values().stream().noneMatch(Boolean.FALSE::equals))
+    }
+
+    public Set<Point2D> getUncovered() {
+        return covered.entrySet().stream()  
+            .filter(entry -> entry.getValue() == false)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toSet());
     }
 }

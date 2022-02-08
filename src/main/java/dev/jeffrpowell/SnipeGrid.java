@@ -6,10 +6,10 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 
-public class Grid {
+public class SnipeGrid {
     private final Deque<GridBranch> branches;
     
-    public Grid(List<Piece> allPieces, LocalDate targetDate) {
+    public SnipeGrid(List<Piece> allPieces, LocalDate targetDate) {
         branches = new ArrayDeque<>();
         branches.add(new GridBranch(allPieces, targetDate));
     }
@@ -18,7 +18,6 @@ public class Grid {
         int totalBranches = 0;
         while(!branches.isEmpty()) {
             GridBranch branch = branches.pop();
-            totalBranches++;
             if (branch.containsAPossibleSolution()) {
                 List<GridBranch> downstreamBranches = branch.getDownstreamBranches();
                 if (downstreamBranches.isEmpty()) {
@@ -27,6 +26,9 @@ public class Grid {
                 else {
                     branch.getDownstreamBranches().forEach(branches::push);
                 }
+            }
+            else {
+                totalBranches++;
             }
         }
         if (log) {

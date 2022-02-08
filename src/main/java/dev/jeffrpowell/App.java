@@ -39,21 +39,11 @@ public class App
             for (int i = 0; i < pieces.size(); i++) {
                 pieceChoices.add(pieces.get(i).get(splitPermutationNum.get(i)));
             }
-            Grid nextGrid = new Grid(pieceChoices, targetDate);
-            long gridTime = 0L;
             boolean log = false;
             if (attempts % 1000 == 0) {
-                gridTime = System.nanoTime();
                 log = true;
             }
-            Optional<GridBranch> result = nextGrid.tryToFindSolution(log);
-            if (log) {
-                System.out.println("Grid time sample: " + (System.nanoTime() - gridTime));
-            }
-            if (result.isPresent()) {
-                printSolution(result.get());
-                break;
-            }
+            runSnipeGrid(pieceChoices, targetDate, log);
             splitPermutationNum = getNextPermutation(splitPermutationNum, maxIndexes);
             if (splitPermutationNum.stream().allMatch(i -> i == 0)) {
                 break;
@@ -73,6 +63,37 @@ public class App
             }
         }
         return nextPermNum;
+    }
+
+    private static boolean runSnipeGrid(List<Piece> pieceChoices, LocalDate targetDate, boolean log) {
+        SnipeGrid nextGrid = new SnipeGrid(pieceChoices, targetDate);
+        long gridTime = 0L;
+        if (log) {
+            gridTime = System.nanoTime();
+        }
+        Optional<GridBranch> result = nextGrid.tryToFindSolution(log);
+        if (log) {
+            System.out.println("Grid time sample: " + (System.nanoTime() - gridTime));
+        }
+        if (result.isPresent()) {
+            printSolution(result.get());
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean runGatherGrid(List<Piece> pieceChoices, boolean log) {
+        GatherGrid nextGrid = new GatherGrid(pieceChoices);
+        long gridTime = 0L;
+        if (log) {
+            gridTime = System.nanoTime();
+        }
+        List<GridBranch> result = nextGrid.tryToFindSolutions(log);
+        if (log) {
+            System.out.println("Grid time sample: " + (System.nanoTime() - gridTime));
+        }
+        result.stream().forEach(App::printSolution);
+        return false;
     }
 
     private static void printSolution(GridBranch branch) {

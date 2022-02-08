@@ -7,6 +7,7 @@ import java.time.Month;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -109,5 +110,39 @@ public class GridConstants {
         );
 
         return grid;
+    }
+
+    public static Map<Point2D, Boolean> generateGrid() {
+        Map<Point2D, Boolean> grid = MONTH_LOCATIONS.values().stream()
+            .collect(Collectors.toMap(
+                Function.identity(),
+                pt -> false
+            ));
+
+        grid.putAll(DAY_LOCATIONS.values().stream()
+            .collect(Collectors.toMap(
+                Function.identity(),
+                pt -> false
+            ))
+        );
+
+        grid.putAll(DAY_OF_WEEK_LOCATIONS.values().stream()
+            .collect(Collectors.toMap(
+                Function.identity(),
+                pt -> false
+            ))
+        );
+
+        return grid;
+    }
+
+    public static boolean isValidSolution(Set<Point2D> uncoveredPts) {
+        if (MONTH_LOCATIONS.values().stream().noneMatch(uncoveredPts::contains)) {
+            return false;
+        }
+        if (DAY_LOCATIONS.values().stream().noneMatch(uncoveredPts::contains)) {
+            return false;
+        }
+        return DAY_OF_WEEK_LOCATIONS.values().stream().anyMatch(uncoveredPts::contains);
     }
 }
