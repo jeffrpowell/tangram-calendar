@@ -40,7 +40,16 @@ public class App
                 pieceChoices.add(pieces.get(i).get(splitPermutationNum.get(i)));
             }
             Grid nextGrid = new Grid(pieceChoices, targetDate);
-            Optional<GridBranch> result = nextGrid.tryToFindSolution();
+            long gridTime = 0L;
+            boolean log = false;
+            if (attempts % 1000 == 0) {
+                gridTime = System.nanoTime();
+                log = true;
+            }
+            Optional<GridBranch> result = nextGrid.tryToFindSolution(log);
+            if (log) {
+                System.out.println("Grid time sample: " + (System.nanoTime() - gridTime));
+            }
             if (result.isPresent()) {
                 printSolution(result.get());
                 break;

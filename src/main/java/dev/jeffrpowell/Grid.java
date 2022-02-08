@@ -14,9 +14,11 @@ public class Grid {
         branches.add(new GridBranch(allPieces, targetDate));
     }
 
-    public Optional<GridBranch> tryToFindSolution() {
+    public Optional<GridBranch> tryToFindSolution(boolean log) {
+        int totalBranches = 0;
         while(!branches.isEmpty()) {
             GridBranch branch = branches.pop();
+            totalBranches++;
             if (branch.containsAPossibleSolution()) {
                 List<GridBranch> downstreamBranches = branch.getDownstreamBranches();
                 if (downstreamBranches.isEmpty()) {
@@ -26,6 +28,9 @@ public class Grid {
                     branch.getDownstreamBranches().forEach(branches::push);
                 }
             }
+        }
+        if (log) {
+            System.out.println("Sample grid total branches tried: " + totalBranches);
         }
         return Optional.empty();
     }
