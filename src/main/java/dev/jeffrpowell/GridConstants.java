@@ -73,13 +73,13 @@ public class GridConstants {
         DAY_LOCATIONS.put(31, new Point2D.Double(2, 6));
         DAY_OF_WEEK_LOCATIONS = new EnumMap<>(DayOfWeek.class);
         DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(3, 6));
-        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(4, 6));
-        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(5, 6));
-        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(6, 6));
+        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.MONDAY, new Point2D.Double(4, 6));
+        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.TUESDAY, new Point2D.Double(5, 6));
+        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.WEDNESDAY, new Point2D.Double(6, 6));
         //row 7
-        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(4, 7));
-        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(5, 7));
-        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SUNDAY, new Point2D.Double(6, 7));
+        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.THURSDAY, new Point2D.Double(4, 7));
+        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.FRIDAY, new Point2D.Double(5, 7));
+        DAY_OF_WEEK_LOCATIONS.put(DayOfWeek.SATURDAY, new Point2D.Double(6, 7));
     }
 
     public static Map<Point2D, Boolean> generateGrid(LocalDate targetDate) {

@@ -40,9 +40,9 @@ public class App
                 pieceChoices.add(pieces.get(i).get(splitPermutationNum.get(i)));
             }
             boolean log = false;
-            if (attempts % 1000 == 0) {
-                log = true;
-            }
+            // if (attempts % 1000 == 0) {
+            //     log = true;
+            // }
             runSnipeGrid(pieceChoices, targetDate, log);
             splitPermutationNum = getNextPermutation(splitPermutationNum, maxIndexes);
             if (splitPermutationNum.stream().allMatch(i -> i == 0)) {
