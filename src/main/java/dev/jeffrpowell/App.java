@@ -4,19 +4,20 @@ import java.awt.geom.Point2D;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class App 
 {
+    static int attempts = 0;
     public static void main( String[] args )
     {
         System.out.println("TANGRAM CALENDAR SOLVER");
-        System.out.println();
-        System.out.println("Initializing all the pieces and their rotations");
         List<List<Piece>> pieces = PieceFactory.createPieces().stream()
             .map(PieceFactory::generateDerivativePieces)
             .collect(Collectors.toList());
@@ -29,10 +30,10 @@ public class App
             IntStream.generate(() -> 0)
                 .limit(pieces.size())
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
-        int attempts = 0;
         LocalDate targetDate = LocalDate.now();
-        System.out.println("Solving for " + targetDate);
+        System.out.println("Solving for " + targetDate + " (" + targetDate.getDayOfWeek() + ")");
         long t = System.nanoTime();
+        Set<GridBranch> solutions = new HashSet<>();
         while (!splitPermutationNum.equals(maxIndexes)) {
             attempts++;
             List<Piece> pieceChoices = new ArrayList<>();
@@ -43,7 +44,8 @@ public class App
             // if (attempts % 1000 == 0) {
             //     log = true;
             // }
-            runSnipeGrid(pieceChoices, targetDate, log);
+            Optional<GridBranch> result = runSnipeGrid(pieceChoices, targetDate, log);
+            result.ifPresent(solutions::add);
             splitPermutationNum = getNextPermutation(splitPermutationNum, maxIndexes);
             if (splitPermutationNum.stream().allMatch(i -> i == 0)) {
                 break;
@@ -65,7 +67,7 @@ public class App
         return nextPermNum;
     }
 
-    private static boolean runSnipeGrid(List<Piece> pieceChoices, LocalDate targetDate, boolean log) {
+    private static Optional<GridBranch> runSnipeGrid(List<Piece> pieceChoices, LocalDate targetDate, boolean log) {
         SnipeGrid nextGrid = new SnipeGrid(pieceChoices, targetDate);
         long gridTime = 0L;
         if (log) {
@@ -77,23 +79,8 @@ public class App
         }
         if (result.isPresent()) {
             printSolution(result.get());
-            return true;
         }
-        return false;
-    }
-
-    private static boolean runGatherGrid(List<Piece> pieceChoices, boolean log) {
-        GatherGrid nextGrid = new GatherGrid(pieceChoices);
-        long gridTime = 0L;
-        if (log) {
-            gridTime = System.nanoTime();
-        }
-        List<GridBranch> result = nextGrid.tryToFindSolutions(log);
-        if (log) {
-            System.out.println("Grid time sample: " + (System.nanoTime() - gridTime));
-        }
-        result.stream().forEach(App::printSolution);
-        return false;
+        return result;
     }
 
     private static void printSolution(GridBranch branch) {
@@ -105,6 +92,7 @@ public class App
                 printInstructions.put(pt, Integer.toString(i));
             }
         }
+        System.out.println("Rotation permutations attempted so far: " + attempts);
         System.out.println(Point2DUtils.pointsToString(printInstructions));
     }
 }

@@ -28,7 +28,7 @@ public class Point2DUtils {
     public static String pointsToString(Map<Point2D, String> pts) {
         Point2D min = pts.keySet().stream().reduce(new Point2D.Double(Integer.MAX_VALUE, Integer.MAX_VALUE), (accum, next) -> new Point2D.Double(Math.min(accum.getX(), next.getX()), Math.min(accum.getY(), next.getY())));
         Point2D max = pts.keySet().stream().reduce(new Point2D.Double(Integer.MIN_VALUE, Integer.MIN_VALUE), (accum, next) -> new Point2D.Double(Math.max(accum.getX(), next.getX()), Math.max(accum.getY(), next.getY())));
-        StringBuilder builder = new StringBuilder("(").append(min.getX()).append(",").append(min.getY()).append(") -> (").append(max.getX()).append(",").append(min.getY()).append(")\n");
+        StringBuilder builder = new StringBuilder();
         for (double row = min.getY(); row < max.getY() + 1; row++) {
             for (double col = min.getX(); col < max.getX() + 1; col++) {
                 Point2D pt = new Point2D.Double(col, row);
@@ -36,7 +36,6 @@ public class Point2DUtils {
             }
             builder.append("\n");
         }
-        builder.append("(").append(min.getX()).append(",").append(max.getY()).append(") -> (").append(max.getX()).append(",").append(max.getY()).append(")\n");
         return builder.toString();
     }
 }
