@@ -15,6 +15,7 @@ import java.util.stream.IntStream;
 public class App 
 {
     static int attempts = 0;
+    static long startTime = 0L;
     public static void main( String[] args )
     {
         System.out.println("TANGRAM CALENDAR SOLVER");
@@ -32,8 +33,8 @@ public class App
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
         LocalDate targetDate = LocalDate.now();
         System.out.println("Solving for " + targetDate + " (" + targetDate.getDayOfWeek() + ")");
-        long t = System.nanoTime();
         Set<GridBranch> solutions = new HashSet<>();
+        startTime = System.nanoTime();
         while (!splitPermutationNum.equals(maxIndexes)) {
             attempts++;
             List<Piece> pieceChoices = new ArrayList<>();
@@ -42,7 +43,9 @@ public class App
             }
             boolean log = false;
             // if (attempts % 1000 == 0) {
-            //     log = true;
+            //     // log = true;
+            //     long elapsedSeconds = (System.nanoTime() - t) / 1_000_000_000L;
+            //     System.out.println("Running average speed: " + (attempts / elapsedSeconds) + " attempts/second"); // 160-180 attempts/second w/the mod operation
             // }
             Optional<GridBranch> result = runSnipeGrid(pieceChoices, targetDate, log);
             result.ifPresent(solutions::add);
@@ -51,7 +54,7 @@ public class App
                 break;
             }
         }
-        System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - t));
+        System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - startTime));
         System.out.println("Attempted rotation permutations (out of 8.3MM): " + attempts);
     }
 
@@ -93,6 +96,8 @@ public class App
             }
         }
         System.out.println("Rotation permutations attempted so far: " + attempts);
+        long elapsedSeconds = (System.nanoTime() - startTime) / 1_000_000_000L;
+        System.out.println("Running average speed: " + (attempts / elapsedSeconds) + " attempts/second"); // 180-190 attempts/second w/o the mod operation above
         System.out.println(Point2DUtils.pointsToString(printInstructions));
     }
 }
