@@ -16,15 +16,35 @@ public class App
 {
     static int attempts = 0;
     static long startTime = 0L;
+    enum Mode {SOLUTION("solution"), HINT("hint");
+        String print;
+        Mode(String print) {
+            this.print = print;
+        }
+
+        static Mode fromArgs(String[] args) {
+            if (args.length > 0 && args[0].equals("hint")) {
+                return HINT;
+            }
+            return SOLUTION;
+        }
+
+        @Override
+        public String toString() {
+            return print;
+        }
+    }
     public static void main( String[] args )
     {
         System.out.println("TANGRAM CALENDAR SOLVER");
+        Mode mode = Mode.fromArgs(args);
+        System.out.println("Running in " + mode + " mode");
         List<List<Piece>> pieces = PieceFactory.createPieces().stream()
             .map(PieceFactory::generateDerivativePieces)
             .collect(Collectors.toList());
         
         List<Integer> maxIndexes = pieces.stream()
-            .map(l -> l.size())
+            .map(List::size)
             .collect(Collectors.toList());
 
         List<Integer> splitPermutationNum = 
@@ -41,13 +61,7 @@ public class App
             for (int i = 0; i < pieces.size(); i++) {
                 pieceChoices.add(pieces.get(i).get(splitPermutationNum.get(i)));
             }
-            boolean log = false;
-            // if (attempts % 1000 == 0) {
-            //     // log = true;
-            //     long elapsedSeconds = (System.nanoTime() - t) / 1_000_000_000L;
-            //     System.out.println("Running average speed: " + (attempts / elapsedSeconds) + " attempts/second"); // 160-180 attempts/second w/the mod operation
-            // }
-            Optional<GridBranch> result = runSnipeGrid(pieceChoices, targetDate, log);
+            Optional<GridBranch> result = runSnipeGrid(pieceChoices, targetDate);
             result.ifPresent(solutions::add);
             splitPermutationNum = getNextPermutation(splitPermutationNum, maxIndexes);
             if (splitPermutationNum.stream().allMatch(i -> i == 0)) {
@@ -55,6 +69,7 @@ public class App
             }
         }
         System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - startTime));
+        System.out.println("Solutions found: " + solutions.size());
         System.out.println("Attempted rotation permutations (out of 8.3MM): " + attempts);
     }
 
@@ -70,16 +85,9 @@ public class App
         return nextPermNum;
     }
 
-    private static Optional<GridBranch> runSnipeGrid(List<Piece> pieceChoices, LocalDate targetDate, boolean log) {
+    private static Optional<GridBranch> runSnipeGrid(List<Piece> pieceChoices, LocalDate targetDate) {
         SnipeGrid nextGrid = new SnipeGrid(pieceChoices, targetDate);
-        long gridTime = 0L;
-        if (log) {
-            gridTime = System.nanoTime();
-        }
-        Optional<GridBranch> result = nextGrid.tryToFindSolution(log);
-        if (log) {
-            System.out.println("Grid time sample: " + (System.nanoTime() - gridTime));
-        }
+        Optional<GridBranch> result = nextGrid.tryToFindSolution();
         if (result.isPresent()) {
             printSolution(result.get());
         }
@@ -97,6 +105,7 @@ public class App
         }
         System.out.println("Rotation permutations attempted so far: " + attempts);
         long elapsedSeconds = (System.nanoTime() - startTime) / 1_000_000_000L;
+        System.out.println("Elapsed seconds: " + elapsedSeconds);
         System.out.println("Running average speed: " + (attempts / elapsedSeconds) + " attempts/second"); // 180-190 attempts/second w/o the mod operation above
         System.out.println(Point2DUtils.pointsToString(printInstructions));
     }

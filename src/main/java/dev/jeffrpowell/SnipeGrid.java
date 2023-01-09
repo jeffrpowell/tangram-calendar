@@ -14,8 +14,7 @@ public class SnipeGrid {
         branches.add(new GridBranch(allPieces, targetDate));
     }
 
-    public Optional<GridBranch> tryToFindSolution(boolean log) {
-        int totalBranches = 0;
+    public Optional<GridBranch> tryToFindSolution() {
         while(!branches.isEmpty()) {
             GridBranch branch = branches.pop();
             if (branch.containsAPossibleSolution()) {
@@ -27,12 +26,6 @@ public class SnipeGrid {
                     branch.getDownstreamBranches().forEach(branches::push);
                 }
             }
-            else {
-                totalBranches++;
-            }
-        }
-        if (log) {
-            System.out.println("Sample grid total branches tried: " + totalBranches);
         }
         return Optional.empty();
     }
