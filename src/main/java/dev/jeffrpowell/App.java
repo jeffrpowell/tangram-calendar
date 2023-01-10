@@ -4,11 +4,10 @@ import java.awt.geom.Point2D;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -16,6 +15,8 @@ public class App
 {
     static int attempts = 0;
     static long startTime = 0L;
+    static Mode mode = Mode.SOLUTION;
+    static List<GridBranch> solutions = new ArrayList<>();
     enum Mode {SOLUTION("solution"), HINT("hint");
         String print;
         Mode(String print) {
@@ -37,7 +38,7 @@ public class App
     public static void main( String[] args )
     {
         System.out.println("TANGRAM CALENDAR SOLVER");
-        Mode mode = Mode.fromArgs(args);
+        mode = Mode.fromArgs(args);
         System.out.println("Running in " + mode + " mode");
         List<List<Piece>> pieces = PieceFactory.createPieces().stream()
             .map(PieceFactory::generateDerivativePieces)
@@ -53,9 +54,8 @@ public class App
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
         LocalDate targetDate = LocalDate.now();
         System.out.println("Solving for " + targetDate + " (" + targetDate.getDayOfWeek() + ")");
-        Set<GridBranch> solutions = new HashSet<>();
         startTime = System.nanoTime();
-        while (!splitPermutationNum.equals(maxIndexes)) {
+        while ((mode == Mode.SOLUTION && !splitPermutationNum.equals(maxIndexes)) || (mode == Mode.HINT && solutions.size() < 5)) {
             attempts++;
             List<Piece> pieceChoices = new ArrayList<>();
             for (int i = 0; i < pieces.size(); i++) {
@@ -68,9 +68,14 @@ public class App
                 break;
             }
         }
-        System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - startTime));
-        System.out.println("Solutions found: " + solutions.size());
-        System.out.println("Attempted rotation permutations (out of 8.3MM): " + attempts);
+        if (mode == Mode.SOLUTION) {
+            System.out.println("Elapsed time (nanoseconds): " + (System.nanoTime() - startTime));
+            System.out.println("Solutions found: " + solutions.size());
+            System.out.println("Attempted rotation permutations (out of 8.3MM): " + attempts);
+        }
+        else {
+            produceHint();
+        }
     }
 
     private static List<Integer> getNextPermutation(List<Integer> lastPermNum, List<Integer> maxIndexes) {
@@ -95,18 +100,37 @@ public class App
     }
 
     private static void printSolution(GridBranch branch) {
-        List<TranslatedPiece> solutionPieces = branch.getSolutionPieces();
-        Map<Point2D, String> printInstructions = new HashMap<>();
-        for (int i = 0; i < solutionPieces.size(); i++) {
-            TranslatedPiece p = solutionPieces.get(i);
-            for (Point2D pt : p.getLocations()) {
-                printInstructions.put(pt, Integer.toString(i));
-            }
+        if (mode == Mode.HINT) {
+            System.out.println("Solution " + (solutions.size()+1) + " found");
         }
         System.out.println("Rotation permutations attempted so far: " + attempts);
         long elapsedSeconds = (System.nanoTime() - startTime) / 1_000_000_000L;
         System.out.println("Elapsed seconds: " + elapsedSeconds);
         System.out.println("Running average speed: " + (attempts / elapsedSeconds) + " attempts/second"); // 180-190 attempts/second w/o the mod operation above
+        if (mode == Mode.SOLUTION) {
+            List<TranslatedPiece> solutionPieces = branch.getSolutionPieces();
+            Map<Point2D, String> printInstructions = new HashMap<>();
+            for (int i = 0; i < solutionPieces.size(); i++) {
+                TranslatedPiece p = solutionPieces.get(i);
+                for (Point2D pt : p.getLocations()) {
+                    printInstructions.put(pt, Integer.toString(i));
+                }
+            }
+            System.out.println(Point2DUtils.pointsToString(printInstructions));
+        }
+    }
+
+    private static void produceHint() {
+        Map<TranslatedPiece, Long> allSolvedPieces = solutions.stream().map(GridBranch::getSolutionPieces).flatMap(List::stream).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        List<TranslatedPiece> frequentSolutionPieces = allSolvedPieces.entrySet().stream().filter(e -> e.getValue() > 2).map(Map.Entry::getKey).collect(Collectors.toList());
+        Map<Point2D, String> printInstructions = new HashMap<>();
+        for (int i = 0; i < frequentSolutionPieces.size(); i++) {
+            TranslatedPiece p = frequentSolutionPieces.get(i);
+            for (Point2D pt : p.getLocations()) {
+                printInstructions.put(pt, Integer.toString(i));
+            }
+        }
+        System.out.println("\nToday's hint:");
         System.out.println(Point2DUtils.pointsToString(printInstructions));
     }
 }
