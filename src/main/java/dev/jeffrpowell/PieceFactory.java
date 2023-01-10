@@ -2,17 +2,19 @@ package dev.jeffrpowell;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PieceFactory {
     private PieceFactory() {}
 
     public static List<Piece> createPieces() {
-        return List.of(
+        List<Piece> pieces = Stream.of(
             new Piece(p(0, 0), p(0, 1), p(0, 2), p(1, 1), p(2, 1)), //T
             new Piece(p(0, 0), p(0, 1), p(0, 2), p(1, 2), p(2, 2)), //wide L
             new Piece(p(0, 0), p(0, 1), p(0, 2), p(0, 3), p(1, 3)), //tall L
@@ -23,7 +25,9 @@ public class PieceFactory {
             new Piece(p(0, 0), p(0, 1), p(1, 1), p(1, 2)),          //Tetris s
             new Piece(p(0, 0), p(1, 0), p(1, 1), p(1, 2), p(2, 2)), //Z
             new Piece(p(0, 0), p(0, 1), p(0, 2), p(1, 2), p(1, 3))  //Skidding s
-        );
+        ).collect(Collectors.toList());
+        Collections.shuffle(pieces);
+        return pieces;
     }
 
     private static Point2D p(double x, double y) {

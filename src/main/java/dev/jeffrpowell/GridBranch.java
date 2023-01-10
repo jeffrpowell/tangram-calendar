@@ -147,4 +147,37 @@ public class GridBranch {
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((unplacedPieces == null) ? 0 : unplacedPieces.hashCode());
+        result = prime * result + ((solutionPieces == null) ? 0 : solutionPieces.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        GridBranch other = (GridBranch) obj;
+        if (unplacedPieces == null) {
+            if (other.unplacedPieces != null)
+                return false;
+        } else if (!unplacedPieces.equals(other.unplacedPieces))
+            return false;
+        if (solutionPieces == null) {
+            if (other.solutionPieces != null)
+                return false;
+        } else if (!solutionPieces.equals(other.solutionPieces))
+            return false;
+        return true;
+    }
+
+    
 }
