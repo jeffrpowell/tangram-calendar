@@ -113,7 +113,7 @@ public class App
             System.out.println("Solution " + (solutions.size()+1) + " found");
         }
         System.out.println("Rotation permutations attempted so far: " + attempts);
-        long elapsedSeconds = (System.nanoTime() - startTime) / 1_000_000_000L;
+        long elapsedSeconds = Math.max((System.nanoTime() - startTime) / 1_000_000_000L, 1L);
         System.out.println("Elapsed seconds: " + elapsedSeconds);
         System.out.println("Running average speed: " + (attempts / elapsedSeconds) + " attempts/second"); // 180-190 attempts/second w/o the mod operation above
         if (mode == Mode.SOLUTION) {
