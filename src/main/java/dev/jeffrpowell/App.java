@@ -133,12 +133,14 @@ public class App
         Map<TranslatedPiece, Long> allSolvedPieces = solutions.stream().map(GridBranch::getSolutionPieces).flatMap(List::stream).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         List<TranslatedPiece> frequentSolutionPieces = allSolvedPieces.entrySet().stream().filter(e -> e.getValue() > 2).map(Map.Entry::getKey).collect(Collectors.toList());
         Set<Point2D> committedPts = new HashSet<>();
+        Set<Piece> committedPieces = new HashSet<>();
         List<TranslatedPiece> filteredFrequentSolutionPieces = new ArrayList<>();
         for (TranslatedPiece piece : frequentSolutionPieces) {
-            if (piece.getLocations().stream().anyMatch(committedPts::contains)) {
+            if (piece.getLocations().stream().anyMatch(committedPts::contains) || committedPieces.contains(piece.getOriginPiece())) {
                 continue;
             }
             committedPts.addAll(piece.getLocations());
+            committedPieces.add(piece.getOriginPiece());
             filteredFrequentSolutionPieces.add(piece);
         }
         if (filteredFrequentSolutionPieces.size() < 2) {
