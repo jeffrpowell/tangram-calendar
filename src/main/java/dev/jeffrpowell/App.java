@@ -132,18 +132,26 @@ public class App
     private static boolean produceHint() {
         Map<TranslatedPiece, Long> allSolvedPieces = solutions.stream().map(GridBranch::getSolutionPieces).flatMap(List::stream).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         List<TranslatedPiece> frequentSolutionPieces = allSolvedPieces.entrySet().stream().filter(e -> e.getValue() > 2).map(Map.Entry::getKey).collect(Collectors.toList());
-        if (frequentSolutionPieces.size() < 2) {
-            System.out.println("Unlucky set of solutions, there were no pieces that were frequently in the same spot. Shuffling pieces and trying a few more.");
+        Set<Point2D> committedPts = new HashSet<>();
+        List<TranslatedPiece> filteredFrequentSolutionPieces = new ArrayList<>();
+        for (TranslatedPiece piece : frequentSolutionPieces) {
+            if (piece.getLocations().stream().anyMatch(committedPts::contains)) {
+                continue;
+            }
+            committedPts.addAll(piece.getLocations());
+            filteredFrequentSolutionPieces.add(piece);
+        }
+        if (filteredFrequentSolutionPieces.size() < 2) {
+            System.out.println("Unlucky set of solutions, there were not enough pieces that were frequently in the same spot. Shuffling pieces and trying a few more.");
             return false;
         }
         Map<Point2D, String> printInstructions = GridConstants.generateGrid().keySet().stream().collect(Collectors.toMap(Function.identity(), k -> "."));
-        for (int i = 0; i < frequentSolutionPieces.size(); i++) {
-            TranslatedPiece p = frequentSolutionPieces.get(i);
+        for (int i = 0; i < Math.min(filteredFrequentSolutionPieces.size(), 4); i++) {
+            TranslatedPiece p = filteredFrequentSolutionPieces.get(i);
             for (Point2D pt : p.getLocations()) {
                 printInstructions.put(pt, Integer.toString(i));
             }
         }
-        ;
         System.out.println("\nToday's hint:");
         System.out.println(Point2DUtils.pointsToString(printInstructions));
         return true;
