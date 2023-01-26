@@ -1,4 +1,4 @@
-package dev.jeffrpowell;
+package dev.jeffpowell;
 
 import java.awt.geom.Point2D;
 import java.time.LocalDate;

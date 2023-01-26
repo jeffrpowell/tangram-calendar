@@ -1,4 +1,4 @@
-package dev.jeffrpowell;
+package dev.jeffpowell;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,6 +15,10 @@ import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import dev.jeffpowell.GridBranch;
+import dev.jeffpowell.Piece;
+import dev.jeffpowell.TranslatedPiece;
 
 public class GridBranchTest {
     GridBranch instance;

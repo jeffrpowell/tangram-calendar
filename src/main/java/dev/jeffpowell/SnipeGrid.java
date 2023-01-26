@@ -1,4 +1,4 @@
-package dev.jeffrpowell;
+package dev.jeffpowell;
 
 import java.time.LocalDate;
 import java.util.ArrayDeque;

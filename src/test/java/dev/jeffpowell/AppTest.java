@@ -1,4 +1,4 @@
-package dev.jeffrpowell;
+package dev.jeffpowell;
 
 import static org.junit.Assert.assertTrue;
 
