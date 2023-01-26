@@ -6,7 +6,7 @@
 
   <groupId>dev.jeffrpowell</groupId>
   <artifactId>tangram-calendar</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
 
   <name>tangram-calendar</name>
   <!-- FIXME change it to the project's website -->
