@@ -16,10 +16,6 @@ import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
 
-import dev.jeffpowell.GridBranch;
-import dev.jeffpowell.Piece;
-import dev.jeffpowell.TranslatedPiece;
-
 public class GridBranchTest {
     GridBranch instance;
 
