@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,7 +32,8 @@ public class App
     static final Function<LocalDate, URI> CF_HINT_URI = d -> URI.create(CF_BASE_URL + "hint/" + d);
     static final Function<LocalDate, URI> CF_SOLUTION_URI = d -> URI.create(CF_BASE_URL + "solution/" + d);
     static final String MAX_DATE_FILENAME = "maxDate";
-    static final LocalDate START_DATE = LocalDate.now();
+    static final String LAST_DATE_FILENAME = "lastDate";
+    static final LocalDate START_DATE = LocalDate.now(); //LocalDate.of(2026, Month.OCTOBER, 18);
     static int attempts = 0;
     static long startTime = 0L;
     static Mode mode = Mode.SOLUTION;
@@ -67,7 +69,8 @@ public class App
         mode = Mode.fromArgs(args);
         System.out.println("Running in " + mode + " mode");
         if (mode == Mode.CLOUDFLARE) {
-            LocalDate maxDate = START_DATE;
+            LocalDate lastDate = START_DATE;
+            LocalDate maxDate = START_DATE.plusDays(7);
             try(Scanner scanner = new Scanner(new File(MAX_DATE_FILENAME))){
                 if (scanner.hasNext()) {
                     String maxDateStr = scanner.next();
@@ -75,12 +78,12 @@ public class App
                     System.out.println("Found maxDate file.");
                 }
             }
-            for (int i = 0; i < 7; i++) {
-                maxDate = maxDate.plusDays(1);
+            while (lastDate.isBefore(maxDate)) {
+                lastDate = lastDate.plusDays(1);
                 solutions.clear();
-                solve(5, maxDate);
-                try (PrintWriter out = new PrintWriter(MAX_DATE_FILENAME)) {
-                    out.print(maxDate);
+                solve(5, lastDate);
+                try (PrintWriter out = new PrintWriter(LAST_DATE_FILENAME)) {
+                    out.print(lastDate);
                 }
             }
         }
@@ -209,7 +212,11 @@ public class App
                 .uri(CF_HINT_URI.apply(targetDate))
                 .POST(BodyPublishers.ofString(hint))
                 .build();
-            httpClient.send(hintRequest, BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(hintRequest, BodyHandlers.ofString());
+            if (response.statusCode() >= 300) {
+                System.err.println("HTTP " + response.statusCode());
+                System.err.println(response.body());
+            }
             List<TranslatedPiece> solutionPieces = solutions.stream().findAny().get().getSolutionPieces();
             printInstructions = new HashMap<>();
             for (int i = 0; i < solutionPieces.size(); i++) {
@@ -224,7 +231,11 @@ public class App
                 .uri(CF_SOLUTION_URI.apply(targetDate))
                 .POST(BodyPublishers.ofString(solution))
                 .build();
-            httpClient.send(solutionRequest, BodyHandlers.ofString());
+            response = httpClient.send(solutionRequest, BodyHandlers.ofString());
+            if (response.statusCode() >= 300) {
+                System.err.println("HTTP " + response.statusCode());
+                System.err.println(response.body());
+            }
         }
         else {
             System.out.println("\nToday's hint:");
