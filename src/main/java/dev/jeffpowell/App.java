@@ -31,6 +31,7 @@ public class App
     static final Function<LocalDate, URI> CF_HINT_URI = d -> URI.create(CF_BASE_URL + "hint/" + d);
     static final Function<LocalDate, URI> CF_SOLUTION_URI = d -> URI.create(CF_BASE_URL + "solution/" + d);
     static final String MAX_DATE_FILENAME = "maxDate";
+    static final LocalDate START_DATE = LocalDate.now();
     static int attempts = 0;
     static long startTime = 0L;
     static Mode mode = Mode.SOLUTION;
@@ -66,7 +67,7 @@ public class App
         mode = Mode.fromArgs(args);
         System.out.println("Running in " + mode + " mode");
         if (mode == Mode.CLOUDFLARE) {
-            LocalDate maxDate = LocalDate.now();
+            LocalDate maxDate = START_DATE;
             try(Scanner scanner = new Scanner(new File(MAX_DATE_FILENAME))){
                 if (scanner.hasNext()) {
                     String maxDateStr = scanner.next();
@@ -84,7 +85,7 @@ public class App
             }
         }
         else {
-            solve(5, LocalDate.now());
+            solve(5, START_DATE);
         }
     }
 
